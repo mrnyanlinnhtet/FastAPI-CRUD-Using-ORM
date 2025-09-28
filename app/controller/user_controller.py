@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.service import user_service
 from app.utils.password import verify
+from app.utils.authentication import generate_jwt_token
 
 
 routers = APIRouter(prefix="")
@@ -17,8 +18,16 @@ async def register(user: UserRegister, db: AsyncSession=Depends(get_db)):
     if existing_user is not None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Already registered.")
     else:
+        token_data = {
+            "email": existing_user.email,
+            "name": existing_user.name
+        }
+        token = generate_jwt_token(token_data)
         await user_service.user_registration(db, user)
-        return {"message": "Successfully registered"}
+        return {
+               "message": "Successfully registered",
+               "token": token
+               }
 
 
 @routers.post("/login")
@@ -31,5 +40,13 @@ async def login(user: UserLogin, db: AsyncSession=Depends(get_db)):
 
     if not verify(user.password, existing_user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-    return {"message": "User login success"}
+    token_data = {
+            "email": existing_user.email,
+            "name": existing_user.name
+            }
+    token = generate_jwt_token(token_data)
+    return {
+           "message": "User login success",
+           "token": token
+           }
 
