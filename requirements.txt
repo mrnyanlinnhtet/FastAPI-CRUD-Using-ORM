@@ -4,3 +4,6 @@ SQLAlchemy
 psycopg2-binary
 asyncpg
 python-dotenv
+python-jose
+passlib
+pydantic-settings

@@ -3,11 +3,15 @@ from app.schemas.user_schemas import UserRegister, UserLogin
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from fastapi import HTTPException
+from app.utils.password import hash
 
 
 async def user_registration(db: AsyncSession, user: UserRegister):
     """Create user from user registration."""
-    user_obj = Users(**user.model_dump())
+    hashed_password = hash(user.password)
+    user_data = user.model_dump()
+    user_data['password'] = hashed_password
+    user_obj = Users(**user_data)
     db.add(user_obj)
     await db.commit()
     await db.refresh(user_obj)

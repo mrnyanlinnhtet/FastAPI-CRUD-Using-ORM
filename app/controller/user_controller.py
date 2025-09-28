@@ -4,16 +4,17 @@ from app.schemas.user_schemas import UserRegister, UserLogin
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.service import user_service
+from app.utils.password import verify
 
 
 routers = APIRouter(prefix="")
 
 @routers.post("/register")
 async def register(user: UserRegister, db: AsyncSession=Depends(get_db)):
-    """User registration process"""
+    """Handle user registration."""
     existing_user = await user_service.get_user_by_email(db, user.email)
 
-    if existing_user is None:
+    if existing_user is not None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Already registered.")
     else:
         await user_service.user_registration(db, user)
@@ -22,10 +23,13 @@ async def register(user: UserRegister, db: AsyncSession=Depends(get_db)):
 
 @routers.post("/login")
 async def login(user: UserLogin, db: AsyncSession=Depends(get_db)):
-    """User login process"""
+    """Handle user login."""
     existing_user = await user_service.get_user_by_email(db, user.email)
 
-    if existing_user is None or (user.password != existing_user.password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    if not existing_user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+
+    if not verify(user.password, existing_user.password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     return {"message": "User login success"}
 
