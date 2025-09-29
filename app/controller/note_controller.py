@@ -1,8 +1,37 @@
-from fastapi import APIRouter
+from typing import List
+from fastapi import APIRouter, Depends, HTTPException
+from app.schemas.note_schemas import CreateNote, UpdateNote, ResponseNote
+from app.database import get_db
+from sqlalchemy.ext.asyncio import AsyncSession
 
-routers = APIRouter(prefix="/notes")
+router = APIRouter(prefix="/notes")
 
 
-@routers.get("/")
-async def test():
-    return {"message": "note"}
+@router.post("/", response_model=ResponseNote)
+async def create_note_api(note: CreateNote, db: AsyncSession=Depends(get_db)):
+    """Handle note creation."""
+    pass
+
+
+@router.get("/", response_model=List[ResponseNote])
+async def get_all_notes_api(db: AsyncSession=Depends(get_db)):
+    """Handle get all notes."""
+    pass
+
+
+@router.get("/{note_id}", response_model=ResponseNote)
+async def get_note_by_id_api(note_id: str, db: AsyncSession=Depends(get_db)):
+    """Handle get note by note id."""
+    pass
+
+
+@router.put("/{note_id}", response_model=ResponseNote)
+async def update_note_api(note_id: str, note: UpdateNote, db: AsyncSession=Depends(get_db)):
+    """Handle update note by note id."""
+    pass
+
+
+@router.delete("/{note_id}", response_model=ResponseNote)
+async def delete_note_api(note_id: str, db: AsyncSession=Depends(get_db)):
+    """Handle delete note by note id."""
+    pass

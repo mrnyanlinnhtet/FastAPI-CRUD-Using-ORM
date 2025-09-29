@@ -1,5 +1,4 @@
 from fastapi import Depends, HTTPException, APIRouter, status
-from app.model.user_model import Users
 from app.schemas.user_schemas import UserRegister, UserLogin
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
@@ -8,9 +7,9 @@ from app.utils.password import verify
 from app.utils.authentication import generate_jwt_token
 
 
-routers = APIRouter(prefix="")
+router = APIRouter(prefix="")
 
-@routers.post("/register")
+@router.post("/register")
 async def register(user: UserRegister, db: AsyncSession=Depends(get_db)):
     """Handle user registration."""
     existing_user = await user_service.get_user_by_email(db, user.email)
@@ -30,7 +29,7 @@ async def register(user: UserRegister, db: AsyncSession=Depends(get_db)):
                }
 
 
-@routers.post("/login")
+@router.post("/login")
 async def login(user: UserLogin, db: AsyncSession=Depends(get_db)):
     """Handle user login."""
     existing_user = await user_service.get_user_by_email(db, user.email)
