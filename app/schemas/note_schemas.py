@@ -24,3 +24,7 @@ class ResponseNote(BaseModel):
     created_at: Optional[datetime] = datetime.now()
     updated_at: Optional[datetime] = datetime.now()
     user_id: str
+
+
+class ResponseNoteMessage(BaseModel):
+    message: str
