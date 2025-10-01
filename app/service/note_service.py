@@ -16,13 +16,13 @@ async def create_note(db: AsyncSession, note: CreateNote):
     return note_object
 
 
-async def get_note_by_id(db: AsyncSession, note_id: UUID):
+async def get_note_by_id(db: AsyncSession, note_id: UUID, user_id: UUID):
     "Get note by note id."
-    note_object = await db.execute(select(Notes).where(Notes.id == note_id))
+    note_object = await db.execute(select(Notes).where(Notes.id == note_id and Notes.user_id == user_id))
     return note_object.scalar_one_or_none()
 
 
-async def get_notes(db: AsyncSession, user_id=Depends(get_current_user)):
+async def get_notes(db: AsyncSession, user_id: UUID):
     """Get all notes for specific user."""
     notes = await db.execute(select(Notes).where(Notes.user_id == user_id))
     return notes.scalars().all()

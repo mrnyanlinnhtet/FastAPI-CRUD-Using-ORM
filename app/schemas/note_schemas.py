@@ -22,7 +22,7 @@ class ResponseNote(BaseModel):
     content: str
     created_at: Optional[datetime] = datetime.now()
     updated_at: Optional[datetime] = datetime.now()
-    user_id: str
+    user_id: UUID4
 
 
 class ResponseNoteMessage(BaseModel):
