@@ -1,8 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, UUID4
 from datetime import datetime
 from typing import Optional
 
 class UserRegister(BaseModel):
+    id: Optional[UUID4] = None
     name: str
     email: str
     password: str

@@ -8,8 +8,7 @@ class CreateNote(BaseModel):
     content: str
     created_at: Optional[datetime] = datetime.now()
     updated_at: Optional[datetime] = datetime.now()
-    user_id: UUID4
-
+    user_id: Optional[UUID4] = None
 
 class UpdateNote(BaseModel):
     title: Optional[str] = ''

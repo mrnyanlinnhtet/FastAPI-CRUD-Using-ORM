@@ -40,6 +40,7 @@ async def login(user: UserLogin, db: AsyncSession=Depends(get_db)):
     if not verify(user.password, existing_user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     token_data = {
+            "id": str(existing_user.id),
             "email": existing_user.email,
             "name": existing_user.name
             }

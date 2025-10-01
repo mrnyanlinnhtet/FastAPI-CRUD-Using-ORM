@@ -3,12 +3,13 @@ from app.schemas.note_schemas import CreateNote, UpdateNote
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.model.note_model import Notes
-from fastapi import HTTPException, status
+from app.utils.authentication import get_current_user
+from fastapi import HTTPException, status, Depends
 
 
 async def create_note(db: AsyncSession, note: CreateNote):
     """Create note."""
-    note_object = Notes(**note.model_dump())
+    note_object = Notes(**note)
     db.add(note_object)
     await db.commit()
     await db.refresh(note_object)
@@ -21,9 +22,9 @@ async def get_note_by_id(db: AsyncSession, note_id: UUID):
     return note_object.scalar_one_or_none()
 
 
-async def get_notes(db: AsyncSession):
+async def get_notes(db: AsyncSession, user_id=Depends(get_current_user)):
     """Get all notes for specific user."""
-    notes = await db.execute(select(Notes))
+    notes = await db.execute(select(Notes).where(Notes.user_id == user_id))
     return notes.scalars().all()
 
 

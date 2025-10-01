@@ -1,16 +1,21 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
-from app.schemas.note_schemas import CreateNote, UpdateNote, ResponseNote
+from app.schemas.note_schemas import CreateNote, UpdateNote, ResponseNote, ResponseNoteMessage
 from app.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.utils.authentication import get_current_user
+from app.service import note_service
 
 router = APIRouter(prefix="/notes")
 
 
-@router.post("/", response_model=ResponseNote)
-async def create_note_api(note: CreateNote, db: AsyncSession=Depends(get_db)):
+@router.post("/", response_model=ResponseNoteMessage)
+async def create_note_api(note: CreateNote, db: AsyncSession=Depends(get_db), user=Depends(get_current_user)):
     """Handle note creation."""
-    pass
+    note_object = note.model_dump()
+    note_object["user_id"] = user["id"]
+    await note_service.create_note(db, note_object)
+    return {"message": " Note successfully created."}
 
 
 @router.get("/", response_model=List[ResponseNote])
