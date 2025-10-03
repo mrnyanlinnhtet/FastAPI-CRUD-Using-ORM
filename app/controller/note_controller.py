@@ -43,12 +43,24 @@ async def get_note_by_id_api(note_id: str, db: AsyncSession=Depends(get_db), use
 
 
 @router.put("/{note_id}", response_model=ResponseNote)
-async def update_note_api(note_id: str, note: UpdateNote, db: AsyncSession=Depends(get_db)):
+async def update_note_api(note_id: str, note: UpdateNote, db: AsyncSession=Depends(get_db), user=Depends(get_current_user)):
     """Handle update note by note id."""
-    pass
+    user_id = user["id"]
+    note_obj = await note_service.update_note(db, note_id, note, user_id)
+
+    if note_obj:
+        return note_obj
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="[Controller]: Note not found!")
 
 
 @router.delete("/{note_id}", response_model=ResponseNote)
-async def delete_note_api(note_id: str, db: AsyncSession=Depends(get_db)):
+async def delete_note_api(note_id: str, db: AsyncSession=Depends(get_db), user=Depends(get_current_user)):
     """Handle delete note by note id."""
-    pass
+    user_id = user["id"]
+    note_obj = await note_service.delete_note(db, note_id, user_id)
+
+    if note_obj:
+        return note_obj
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="[Controller]: Note not found!")

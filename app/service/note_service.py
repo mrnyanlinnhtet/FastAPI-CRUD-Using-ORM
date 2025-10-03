@@ -28,9 +28,9 @@ async def get_notes(db: AsyncSession, user_id: UUID):
     return notes.scalars().all()
 
 
-async def update_note(db: AsyncSession, note_id: UUID, note: UpdateNote):
+async def update_note(db: AsyncSession, note_id: UUID, note: UpdateNote, user_id: UUID):
     """Update note by note id."""
-    data = await db.execute(select(Notes).where(note_id))
+    data = await db.execute(select(Notes).where(Notes.id == note_id and Notes.user_id == user_id))
     note_object = data.scalar_one_or_none()
 
     if not note_object:
@@ -43,9 +43,12 @@ async def update_note(db: AsyncSession, note_id: UUID, note: UpdateNote):
         return note_object
 
 
-async def delete_note(db: AsyncSession, note_id: UUID):
+async def delete_note(db: AsyncSession, note_id: UUID, user_id: UUID):
     """Delete note by note id."""
-    note_obj = await db.execute(select(Notes).where(Notes.id == note_id))
+    result = await db.execute(select(Notes).where(
+        (Notes.id == note_id) & (Notes.user_id == user_id)
+        ))
+    note_obj = result.scalar_one_or_none()
 
     if not note_obj:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="[Service]: Note not found!")
